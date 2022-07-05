@@ -4,8 +4,8 @@ use crate::{
     Decimal,
 };
 use core::fmt;
+use diesel::pg::PgValue;
 use std::error;
-
 #[derive(Debug, Clone)]
 pub struct InvalidDecimal {
     inner: Option<String>,
@@ -210,16 +210,20 @@ mod diesel_postgres {
     }
 
     impl ToSql<Numeric, Pg> for Decimal {
-        fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
+        fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
             let numeric = PgNumeric::from(self);
-            ToSql::<Numeric, Pg>::to_sql(&numeric, out)
+            ToSql::<Numeric, Pg>::to_sql(&numeric, &mut out.reborrow())
         }
     }
 
     impl FromSql<Numeric, Pg> for Decimal {
-        fn from_sql(numeric: Option<&[u8]>) -> deserialize::Result<Self> {
-            PgNumeric::from_sql(numeric)?.try_into()
+        fn from_sql(bytes: PgValue<'_>) -> deserialize::Result<Self> {
+            PgNumeric::from_sql(bytes)?.try_into()
         }
+
+        // fn from_sql(numeric: Option<&[u8]>) -> deserialize::Result<Self> {
+        //     PgNumeric::from_sql(numeric)?.try_into()
+        // }
     }
 
     #[cfg(test)]
