@@ -54,7 +54,7 @@ version-sync = { default-features = false, features = ["html_root_url_updated", 
 [features]
 c-repr = [] # Force Decimal to be repr(C)
 db-diesel-mysql = ["diesel/mysql", "std"]
-db-diesel-postgres = ["diesel/postgres", "std"]
+db-diesel-postgres = ["diesel/postgres_backend", "std"]
 db-postgres = ["byteorder", "bytes", "postgres", "std"]
 db-tokio-postgres = ["byteorder", "bytes", "postgres", "std", "tokio-postgres"]
 default = ["serde", "std"]
